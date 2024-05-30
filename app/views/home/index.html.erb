@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gym Locator</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Gym Locator</a>
+    <div class="collapse navbar-collapse">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="#">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Search</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>Welcome to Gym Locator</h1>
+    <p>This is the home page.</p>
+
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#equipmentModal">
+      器具から選ぶ
+    </button>
+
+    <div class="modal fade" id="equipmentModal" tabindex="-1" role="dialog" aria-labelledby="equipmentModalLabel" aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="equipmentModalLabel">器具一覧</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            <form id="equipmentForm">
+              <ul id="equipmentList">
+                <!-- 仮の器具名を追加 -->
+                <li>
+                  <input type="checkbox" name="equipment[]" value="1">
+                  <label>器具1</label>
+                </li>
+                <li>
+                  <input type="checkbox" name="equipment[]" value="2">
+                  <label>器具2</label>
+                </li>
+                <li>
+                  <input type="checkbox" name="equipment[]" value="3">
+                  <label>器具3</label>
+                </li>
+              </ul>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+            <button type="button" class="btn btn-primary" id="searchButton">検索</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+    <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      // 検索ボタンのクリックイベントを設定
+      document.getElementById('searchButton').addEventListener('click', function() {
+        const form = document.getElementById('equipmentForm');
+        const formData = new FormData(form);
+        const selectedEquipments = formData.getAll('equipment[]');
+
+        // 選択された器具IDをクエリパラメータとして地図ページへ遷移
+        window.location.href = `/map?equipments=${selectedEquipments.join(',')}`;
+      });
+    });
+    </script>
+  </div>
+</body>
+</html>
