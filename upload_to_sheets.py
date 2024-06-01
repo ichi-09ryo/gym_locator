@@ -2,13 +2,14 @@ import pandas as pd
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 import requests
+from bs4 import BeautifulSoup
 
 # サービスアカウントキーのJSONファイルパス
-SERVICE_ACCOUNT_FILE = 'keen-dispatch-424708-v5-53a1436f17bd.json'  # JSONファイルのパスを設定
+SERVICE_ACCOUNT_FILE = 'keen-dispatch-424708-v5-53a1436f17bd.json'
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 # スプレッドシートIDと範囲を設定
-SPREADSHEET_ID = '1NgI3RpS8Nzd6-fkXJBLtsp6DTOaSZ5SFwl0g6CjgSKs'  # 正しいスプレッドシートIDを設定
+SPREADSHEET_ID = '1NgI3RpS8Nzd6-fkXJBLtsp6DTOaSZ5SFwl0g6CjgSKs'
 RANGE_NAME = 'シート1!A1'
 
 # サービスアカウントの認証情報を設定
@@ -19,28 +20,27 @@ credentials = service_account.Credentials.from_service_account_file(
 service = build('sheets', 'v4', credentials=credentials)
 sheet = service.spreadsheets()
 
-# 店舗データのサンプル
-data = {
-    '店舗名': [
-        'エニタイムフィットネス新宿西口店', 'エニタイムフィットネス新宿南口店', 'エニタイムフィットネス高田馬場店',
-        'エニタイムフィットネス新宿御苑前店', 'エニタイムフィットネス新宿河田町店', 'エニタイムフィットネス新宿中井店',
-        'エニタイムフィットネス曙橋店', 'エニタイムフィットネス飯田橋店', 'エニタイムフィットネス市ヶ谷店',
-        'エニタイムフィットネス東新宿店', 'エニタイムフィットネス神楽坂店', 'エニタイムフィットネス早稲田店',
-        'エニタイムフィットネス四谷三丁目店', 'エニタイムフィットネス大久保店', 'エニタイムフィットネス西新宿7丁目店',
-        'エニタイムフィットネス新宿歌舞伎町店', 'エニタイムフィットネス新宿曙橋店'
-    ],
-    '住所': [
-        '東京都新宿区西新宿7-8-11', '東京都新宿区新宿4-3-15 レイフラット新宿 B1F', '東京都新宿区高田馬場4-11-10',
-        '東京都新宿区新宿1-24-3 新宿1丁目ビル B1F', '東京都新宿区河田町3-52', '東京都新宿区上落合3-2-4 東京トラフィック開発中井ビル',
-        '東京都新宿区住吉町8-14 メゾンドK 1F-B1', '東京都新宿区下宮比町2-1 第一勧銀稲垣ビル B1', '東京都新宿区市谷田町2-17 八重洲市谷ビル B1',
-        '東京都新宿区大久保1-3-15 アクロス東新宿 2F', '東京都新宿区榎町43-1 ユニゾ神楽坂ビル 1F', '東京都新宿区西早稲田3-21-5',
-        '東京都新宿区四谷3-12 フォーキャスト四谷 2F', '東京都新宿区百人町1-24-4 加藤ビル 2F', '東京都新宿区西新宿7-10-19 西新宿ビル 1F',
-        '東京都新宿区歌舞伎町1-1-19 コメサプラザ 3F', '東京都新宿区住吉町1-13 サンプラザ住吉 2F'
-    ]
-}
+# スクレイピング対象のURL
+URL = 'https://www.anytimefitness.co.jp/kanto/tokyo/'
+
+# ページの内容を取得
+response = requests.get(URL)
+soup = BeautifulSoup(response.content, 'html.parser')
+
+# 店舗名と住所を取得
+shops = soup.find_all('li')
+data = []
+for shop in shops:
+    name = shop.find('p', class_='name').get_text() if shop.find('p', class_='name') else None
+    address = shop.find('p', class_='address').get_text() if shop.find('p', class_='address') else None
+    if name and address:
+        data.append({'店舗名': name, '住所': address})
 
 # データフレームの作成
 df = pd.DataFrame(data)
+
+# データフレームを表示
+print(df)
 
 # 住所から緯度・経度を取得する関数
 def get_lat_long(api_key, address):
@@ -55,7 +55,7 @@ def get_lat_long(api_key, address):
     return None, None
 
 # APIキーを設定
-API_KEY = "AIzaSyA2ghhF-QX1JbH36JdhWghvjMXRhigddZA"  # ここを自身のAPIキーに置き換える
+API_KEY = "AIzaSyA2ghhF-QX1JbH36JdhWghvjMXRhigddZA"
 
 # 住所から緯度・経度を取得
 lat_long_data = [get_lat_long(API_KEY, address) for address in df['住所']]
