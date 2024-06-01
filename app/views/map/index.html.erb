@@ -1,57 +1,40 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Gym Locator</title>
+  <title>Gym Locator Map</title>
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
 
   <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- Google Maps APIを非同期で読み込む -->
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2ghhF-QX1JbH36JdhWghvjMXRhigddZA&callback=initMap"></script>
 </head>
-
 <body>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#">Gym Locator</a>
-    <div class="collapse navbar-collapse">
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item">
-          <a class="nav-link" href="#">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Search</a>
-        </li>
-      </ul>
-    </div>
-  </nav>
+  <h1>ジムの場所</h1>
+  <div id="map" style="height: 500px;"></div>
 
-  <div class="container">
-    <h1>ジムの場所</h1>
-    <div id="map" style="height: 500px;"></div>
-
-    <script>
-      function initMap() {
-        var map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 12,
-          center: { lat: 35.6895, lng: 139.6917 }
-        });
-
-        <% @gyms.each do |gym| %>
-          var marker = new google.maps.Marker({
-            position: { lat: <%= gym.latitude %>, lng: <%= gym.longitude %> },
-            map: map,
-            title: '<%= gym.gym_name %>'
-          });
-        <% end %>
-      }
-
-      document.addEventListener("DOMContentLoaded", function() {
-        var script = document.createElement('script');
-        script.src = `https://maps.googleapis.com/maps/api/js?key=AIzaSyA2ghhF-QX1JbH36JdhWghvjMXRhigddZA&callback=initMap`;
-        script.async = true;
-        script.defer = true;
-        document.head.appendChild(script);
+  <script>
+    function initMap() {
+      var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 12,
+        center: { lat: 35.6895, lng: 139.6917 }
       });
-    </script>
-  </div>
+
+      <% @gyms.each do |gym| %>
+        var marker = new google.maps.Marker({
+          position: { lat: <%= gym.latitude %>, lng: <%= gym.longitude %> },
+          map: map,
+          title: '<%= gym.gym_name %>',
+          icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+        });
+      <% end %>
+    }
+  </script>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
 </html>

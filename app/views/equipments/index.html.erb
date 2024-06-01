@@ -1,0 +1,28 @@
+<h1>器具一覧</h1>
+<form id="equipmentForm">
+  <ul id="equipmentList">
+    <% if @equipments.present? %>
+      <% @equipments.each do |equipment| %>
+        <li>
+          <input type="checkbox" name="equipment[]" value="<%= equipment %>">
+          <label><%= equipment %></label>
+        </li>
+      <% end %>
+    <% else %>
+      <li>器具情報がありません。</li>
+    <% end %>
+  </ul>
+</form>
+<button type="button" id="searchButton">検索</button>
+
+<script>
+document.getElementById('searchButton').addEventListener('click', function() {
+  const form = document.getElementById('equipmentForm');
+  const formData = new FormData(form);
+  const selectedEquipments = formData.getAll('equipment[]');
+  
+  window.location.href = `/map?equipments=${selectedEquipments.join(',')}`;
+});
+</script>
+
+<%= javascript_include_tag 'equipments', 'data-turbolinks-track': 'reload' %>

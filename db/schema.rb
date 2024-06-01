@@ -11,8 +11,8 @@
 # It's strongly recommended that you check this file into your version control system.
 
 ActiveRecord::Schema[7.0].define(version: 2024_05_30_034552) do
-  create_table "equipment", charset: "utf8", force: :cascade do |t|
-    t.string "machine_name", null: false
+  create_table "equipments", charset: "utf8", force: :cascade do |t|
+    t.string "equipment_name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
@@ -22,8 +22,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_30_034552) do
     t.bigint "equipment_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["equipment_id"], name: "index_gym_equipments_on_equipment_id"
-    t.index ["gym_id"], name: "index_gym_equipments_on_gym_id"
+    t.index ["equipment_id"], name: "fk_rails_9b17b277a3"
+    t.index ["gym_id"], name: "fk_rails_2417439a57"
   end
 
   create_table "gyms", charset: "utf8", force: :cascade do |t|
@@ -35,6 +35,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_30_034552) do
     t.datetime "updated_at", null: false
   end
 
-  add_foreign_key "gym_equipments", "equipment"
+  add_foreign_key "gym_equipments", "equipments"
   add_foreign_key "gym_equipments", "gyms"
 end
