@@ -2,6 +2,7 @@ import pandas as pd
 from google.oauth2 import service_account
 from googleapiclient.discovery import build
 import mysql.connector
+from datetime import datetime
 
 # サービスアカウントキーのJSONファイルパス
 SERVICE_ACCOUNT_FILE = 'keen-dispatch-424708-v5-53a1436f17bd.json'
@@ -38,7 +39,7 @@ conn = mysql.connector.connect(
     host='localhost',
     user='root',
     password='',  # パスワードを空に設定
-    database='gym_locator_development'  # データベース名を修正
+    database='gym_locator_development'
 )
 cursor = conn.cursor()
 
@@ -84,18 +85,18 @@ cursor.execute('DELETE FROM gyms')
 # スプレッドシート1のデータをジムテーブルに挿入
 for index, row in df1.iterrows():
     cursor.execute('''
-    INSERT INTO gyms (gym_name, address, latitude, longitude)
-    VALUES (%s, %s, %s, %s)
-    ''', (row['店舗名'], row['住所'], row['緯度'], row['経度']))
+    INSERT INTO gyms (gym_name, address, latitude, longitude, created_at, updated_at)
+    VALUES (%s, %s, %s, %s, %s, %s)
+    ''', (row['店舗名'], row['住所'], row['緯度'], row['経度'], datetime.now(), datetime.now()))
 
 # スプレッドシート2のデータを器具テーブルに挿入
 for index, row in df2.iterrows():
     cursor.execute('''
-    INSERT INTO equipments (equipment_name)
-    VALUES (%s)
-    ''', (row['器具名'],))
+    INSERT INTO equipments (equipment_name, created_at, updated_at)
+    VALUES (%s, %s, %s)
+    ''', (row['器具名'], datetime.now(), datetime.now()))
 
-# gymsとequipmentsテーブルのIDを取得してgym_equipmentsテーブルに挿入
+# gym_equipmentsテーブルにデータを挿入
 for index, row in df2.iterrows():
     cursor.execute('SELECT id FROM gyms WHERE gym_name = %s', (row['店舗名'],))
     gym_id = cursor.fetchone()
@@ -103,9 +104,11 @@ for index, row in df2.iterrows():
     equipment_id = cursor.fetchone()
     if gym_id and equipment_id:
         cursor.execute('''
-        INSERT INTO gym_equipments (gym_id, equipment_id)
-        VALUES (%s, %s)
-        ''', (gym_id[0], equipment_id[0]))
+        INSERT INTO gym_equipments (gym_id, equipment_id, created_at, updated_at)
+        VALUES (%s, %s, %s, %s)
+        ''', (gym_id[0], equipment_id[0], datetime.now(), datetime.now()))
+    else:
+        print(f"Gym or Equipment not found for entry: {row}")
 
 # コミットして接続を閉じる
 conn.commit()
