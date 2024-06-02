@@ -9,10 +9,10 @@ SERVICE_ACCOUNT_FILE = 'keen-dispatch-424708-v5-53a1436f17bd.json'
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 # スプレッドシートIDと範囲を設定
-SPREADSHEET_ID1 = '1NgI3RpS8Nzd6-fkXJBLtsp6DTOaSZ5SFwl0g6CjgSKs'  # 店舗名、住所、緯度、経度のスプレッドシートID
-RANGE_NAME1 = 'シート1!A1:D100'
-SPREADSHEET_ID2 = '1aA46jjd1cq7BhPFipSLntuusgw7YCz-ZPh_RqCtgq5A'  # 店舗名、器具名のスプレッドシートID
-RANGE_NAME2 = 'シート1!A1:B100'
+SPREADSHEET_ID1 = '1NgI3RpS8Nzd6-fkXJBLtsp6DTOaSZ5SFwl0g6CjgSKs'
+RANGE_NAME1 = 'シート1!A1:D10000'  # 範囲を10000に拡張
+SPREADSHEET_ID2 = '1aA46jjd1cq7BhPFipSLntuusgw7YCz-ZPh_RqCtgq5A'
+RANGE_NAME2 = 'シート1!A1:B10000'  # 範囲を10000に拡張
 
 # サービスアカウントの認証情報を設定
 credentials = service_account.Credentials.from_service_account_file(
@@ -79,8 +79,11 @@ CREATE TABLE IF NOT EXISTS gym_equipments (
 
 # データを削除して新しいデータを挿入
 cursor.execute('DELETE FROM gym_equipments')
+conn.commit()
 cursor.execute('DELETE FROM equipments')
+conn.commit()
 cursor.execute('DELETE FROM gyms')
+conn.commit()
 
 # スプレッドシート1のデータをジムテーブルに挿入
 for index, row in df1.iterrows():
@@ -88,6 +91,7 @@ for index, row in df1.iterrows():
     INSERT INTO gyms (gym_name, address, latitude, longitude, created_at, updated_at)
     VALUES (%s, %s, %s, %s, %s, %s)
     ''', (row['店舗名'], row['住所'], row['緯度'], row['経度'], datetime.now(), datetime.now()))
+    conn.commit()
 
 # スプレッドシート2のデータを器具テーブルに挿入
 for index, row in df2.iterrows():
@@ -95,18 +99,28 @@ for index, row in df2.iterrows():
     INSERT INTO equipments (equipment_name, created_at, updated_at)
     VALUES (%s, %s, %s)
     ''', (row['器具名'], datetime.now(), datetime.now()))
+    conn.commit()
 
 # gym_equipmentsテーブルにデータを挿入
 for index, row in df2.iterrows():
     cursor.execute('SELECT id FROM gyms WHERE gym_name = %s', (row['店舗名'],))
     gym_id = cursor.fetchone()
+    if gym_id:
+        gym_id = gym_id[0]  # 結果をタプルから抽出
+    cursor.fetchall()  # 残りの結果をクリア
+
     cursor.execute('SELECT id FROM equipments WHERE equipment_name = %s', (row['器具名'],))
     equipment_id = cursor.fetchone()
+    if equipment_id:
+        equipment_id = equipment_id[0]  # 結果をタプルから抽出
+    cursor.fetchall()  # 残りの結果をクリア
+
     if gym_id and equipment_id:
         cursor.execute('''
         INSERT INTO gym_equipments (gym_id, equipment_id, created_at, updated_at)
         VALUES (%s, %s, %s, %s)
-        ''', (gym_id[0], equipment_id[0], datetime.now(), datetime.now()))
+        ''', (gym_id, equipment_id, datetime.now(), datetime.now()))
+        conn.commit()
     else:
         print(f"Gym or Equipment not found for entry: {row}")
 

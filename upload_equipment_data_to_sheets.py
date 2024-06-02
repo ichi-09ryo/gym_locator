@@ -5,11 +5,11 @@ import requests
 from bs4 import BeautifulSoup
 
 # サービスアカウントキーのJSONファイルパス
-SERVICE_ACCOUNT_FILE = 'keen-dispatch-424708-v5-53a1436f17bd.json'  # JSONファイルのパスを設定
+SERVICE_ACCOUNT_FILE = 'keen-dispatch-424708-v5-53a1436f17bd.json'
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 # スプレッドシートIDと範囲を設定
-SPREADSHEET_ID = '1aA46jjd1cq7BhPFipSLntuusgw7YCz-ZPh_RqCtgq5A'  # 器具用スプレッドシートIDを設定
+SPREADSHEET_ID = '1aA46jjd1cq7BhPFipSLntuusgw7YCz-ZPh_RqCtgq5A'
 RANGE_NAME = 'シート1!A1'
 
 # サービスアカウントの認証情報を設定
@@ -23,7 +23,8 @@ sheet = service.spreadsheets()
 # 店舗とURLのリスト
 stores = [
     {'name': '曙橋店', 'url': 'https://www.anytimefitness.co.jp/akebonobashi/facility/'},
-    # 他の店舗の情報をここに追加
+    {'name': '御茶ノ水店', 'url': 'https://www.anytimefitness.co.jp/ochanomizu/facility/'},
+    {'name': '安曇野店', 'url': 'https://www.anytimefitness.co.jp/azumino/facility/'},
 ]
 
 # 全ての店舗のデータを格納するリスト

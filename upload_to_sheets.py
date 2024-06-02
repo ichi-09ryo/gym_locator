@@ -20,21 +20,25 @@ credentials = service_account.Credentials.from_service_account_file(
 service = build('sheets', 'v4', credentials=credentials)
 sheet = service.spreadsheets()
 
-# スクレイピング対象のURL
-URL = 'https://www.anytimefitness.co.jp/kanto/tokyo/'
+# スクレイピング対象のURLリスト
+URLS = [
+    'https://www.anytimefitness.co.jp/kanto/tokyo/',
+    'https://www.anytimefitness.co.jp/chubu/nagano/'
+]
 
-# ページの内容を取得
-response = requests.get(URL)
-soup = BeautifulSoup(response.content, 'html.parser')
-
-# 店舗名と住所を取得
-shops = soup.find_all('li')
 data = []
-for shop in shops:
-    name = shop.find('p', class_='name').get_text() if shop.find('p', class_='name') else None
-    address = shop.find('p', class_='address').get_text() if shop.find('p', class_='address') else None
-    if name and address:
-        data.append({'店舗名': name, '住所': address})
+
+# 各URLから店舗名と住所を取得
+for url in URLS:
+    response = requests.get(url)
+    soup = BeautifulSoup(response.content, 'html.parser')
+    
+    shops = soup.find_all('li')
+    for shop in shops:
+        name = shop.find('p', class_='name').get_text() if shop.find('p', class_='name') else None
+        address = shop.find('p', class_='address').get_text() if shop.find('p', class_='address') else None
+        if name and address:
+            data.append({'店舗名': name, '住所': address})
 
 # データフレームの作成
 df = pd.DataFrame(data)

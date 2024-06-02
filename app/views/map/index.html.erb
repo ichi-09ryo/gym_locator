@@ -13,6 +13,7 @@
 </head>
 <body>
   <h1>ジムの場所</h1>
+  
   <div id="map" style="height: 500px;"></div>
 
   <script>
@@ -22,14 +23,27 @@
         center: { lat: 35.6895, lng: 139.6917 }
       });
 
-      <% @gyms.each do |gym| %>
+      var gyms = <%= raw @gyms.to_json %>;
+
+      var infowindow = new google.maps.InfoWindow();
+
+      gyms.forEach(function(gym) {
         var marker = new google.maps.Marker({
-          position: { lat: <%= gym.latitude %>, lng: <%= gym.longitude %> },
+          position: { lat: gym.latitude, lng: gym.longitude },
           map: map,
-          title: '<%= gym.gym_name %>',
+          title: gym.gym_name,
           icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
         });
-      <% end %>
+
+        marker.addListener('mouseover', function() {
+          infowindow.setContent('<div><strong>' + gym.gym_name + '</strong><br>' + gym.address + '</div>');
+          infowindow.open(map, marker);
+        });
+
+        marker.addListener('mouseout', function() {
+          infowindow.close();
+        });
+      });
     }
   </script>
 
