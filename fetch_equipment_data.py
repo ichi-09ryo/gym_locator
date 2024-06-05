@@ -12,9 +12,9 @@ SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
 
 # スプレッドシートIDと範囲を設定
 SPREADSHEET_ID1 = '1NgI3RpS8Nzd6-fkXJBLtsp6DTOaSZ5SFwl0g6CjgSKs'
-RANGE_NAME1 = 'シート1!A1:D10000'  # 範囲を10000に拡張
+RANGE_NAME1 = 'シート1!A1:D10000'
 SPREADSHEET_ID2 = '1aA46jjd1cq7BhPFipSLntuusgw7YCz-ZPh_RqCtgq5A'
-RANGE_NAME2 = 'シート1!A1:B10000'  # 範囲を10000に拡張
+RANGE_NAME2 = 'シート1!A1:B10000'
 
 # サービスアカウントの認証情報を設定
 credentials = service_account.Credentials.from_service_account_file(
@@ -95,7 +95,7 @@ CREATE TABLE IF NOT EXISTS gyms (
 cursor.execute('''
 CREATE TABLE IF NOT EXISTS equipments (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,
-    equipment_name VARCHAR(255),
+    equipment_name VARCHAR(255) UNIQUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 )
@@ -138,11 +138,14 @@ print(f"Gyms inserted: {gyms_inserted}")
 for index, row in df2.iterrows():
     equipment_name = row['器具名']
     if equipment_name:  # equipment_nameがNULLでないか確認
-        cursor.execute('''
-        INSERT INTO equipments (equipment_name, created_at, updated_at)
-        VALUES (%s, %s, %s)
-        ''', (equipment_name, datetime.now(), datetime.now()))
-        conn.commit()
+        try:
+            cursor.execute('''
+            INSERT INTO equipments (equipment_name, created_at, updated_at)
+            VALUES (%s, %s, %s)
+            ''', (equipment_name, datetime.now(), datetime.now()))
+            conn.commit()
+        except mysql.connector.errors.IntegrityError:
+            print(f"Duplicate entry '{equipment_name}' ignored.")
     else:
         print(f"Skipped insertion: equipment_name is None for row {index}")
 
