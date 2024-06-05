@@ -21,29 +21,112 @@ service = build('sheets', 'v4', credentials=credentials)
 sheet = service.spreadsheets()
 
 # スクレイピング対象のURLリスト
-URLS = [
-    'https://www.anytimefitness.co.jp/kanto/tokyo/',
-    'https://www.anytimefitness.co.jp/chubu/nagano/'
+urls = [
+    'https://fitplace.jp/gyms/nippori/',
+    'https://fitplace.jp/gyms/higashi-yamato/',
+    'https://fitplace.jp/gyms/bubaigawara/',
+    'https://fitplace.jp/gyms/machiya/',
+    'https://fitplace.jp/gyms/ikebukuro/',
+    'https://fitplace.jp/gyms/shinjuku-nishiguchi/',
+    'https://fitplace.jp/gyms/suidobashi/',
+    'https://fitplace.jp/gyms/ueno/',
+    'https://fitplace.jp/gyms/otsuka/',
+    'https://fitplace.jp/gyms/omori/',
+    'https://fitplace.jp/gyms/shimoakatsuka/',
+    'https://fitplace.jp/gyms/itabashi/',
+    'https://fitplace.jp/gyms/hasune/',
+    'https://fitplace.jp/gyms/shin-koiwa/',
+    'https://fitplace.jp/gyms/minamiasagaya/',
+    'https://fitplace.jp/gyms/kanda/',
+    'https://fitplace.jp/gyms/minowa/',
+    'https://fitplace.jp/gyms/musashikoganei/',
+    'https://fitplace.jp/gyms/kanamachi/',
+    'https://fitplace.jp/gyms/hachioji/',
+    'https://fitplace.jp/gyms/narimasu/',
+    'https://fitplace.jp/gyms/zoshiki/',
+    'https://fitplace.jp/gyms/tama-center/',
+    'https://fitplace.jp/gyms/ayase/',
+    'https://fitplace.jp/gyms/oyama/',
+    'https://fitplace.jp/gyms/aomono-yokocho/',
+    'https://fitplace.jp/gyms/dokkyo-daigakumae/',
+    'https://fitplace.jp/gyms/urawa/',
+    'https://fitplace.jp/gyms/honkawagoe/',
+    'https://fitplace.jp/gyms/kawaguchi/',
+    'https://fitplace.jp/gyms/tokorozawa/',
+    'https://fitplace.jp/gyms/koshigaya/',
+    'https://fitplace.jp/gyms/kumagaya/',
+    'https://fitplace.jp/gyms/chiba-chuo/',
+    'https://fitplace.jp/gyms/tsuga/',
+    'https://fitplace.jp/gyms/gyotoku/',
+    'https://fitplace.jp/gyms/tsudanuma/',
+    'https://fitplace.jp/gyms/shin-matsudo/',
+    'https://fitplace.jp/gyms/motoyawata/',
+    'https://fitplace.jp/gyms/sagamiono/',
+    'https://fitplace.jp/gyms/gumyoji/',
+    'https://fitplace.jp/gyms/hiratsuka/',
+    'https://fitplace.jp/gyms/kawasaki/',
+    'https://fitplace.jp/gyms/ofuna/',
+    'https://fitplace.jp/gyms/minatomirai/',
+    'https://fitplace.jp/gyms/kannai/',
+    'https://fitplace.jp/gyms/sano/',
+    'https://fitplace.jp/gyms/nagaoka/',
+    'https://fitplace.jp/gyms/koufu-mukomachi/',
+    'https://fitplace.jp/gyms/shizuoka-2/',
+    'https://fitplace.jp/gyms/obu/',
+    'https://fitplace.jp/gyms/mikawa-anjou/',
+    'https://fitplace.jp/gyms/hisaya-odori/',
+    'https://fitplace.jp/gyms/handa/',
+    'https://fitplace.jp/gyms/kasugai/',
+    'https://fitplace.jp/gyms/ichinomiya/',
+    'https://fitplace.jp/gyms/meiyontango-dori/',
+    'https://fitplace.jp/gyms/neyagawa/',
+    'https://fitplace.jp/gyms/bentencho/',
+    'https://fitplace.jp/gyms/kyobashi/',
+    'https://fitplace.jp/gyms/kire-uriwari/',
+    'https://fitplace.jp/gyms/tamade/',
+    'https://fitplace.jp/gyms/teradacho/',
+    'https://fitplace.jp/gyms/nagai/',
+    'https://fitplace.jp/gyms/korien/',
+    'https://fitplace.jp/gyms/esaka/',
+    'https://fitplace.jp/gyms/kameoka/',
+    'https://fitplace.jp/gyms/saiin/',
+    'https://fitplace.jp/gyms/hyakumamben/',
+    'https://fitplace.jp/gyms/nishi-oji/',
+    'https://fitplace.jp/gyms/himeji-imajyuku/',
+    'https://fitplace.jp/gyms/rokko/',
+    'https://fitplace.jp/gyms/sannomiya/',
+    'https://fitplace.jp/gyms/otsu-seta/',
+    'https://fitplace.jp/gyms/matsue/',
+    'https://fitplace.jp/gyms/fukuoka-imajuku/',
+    'https://fitplace.jp/gyms/kokura-kuzuhara/',
+    'https://fitplace.jp/gyms/hakata-gion/',
+    'https://fitplace.jp/gyms/kokura/',
+    'https://fitplace.jp/gyms/ohashi/',
+    'https://fitplace.jp/gyms/miyazaki-oshima/'
+
 ]
 
 data = []
 
-# 各URLから店舗名と住所を取得
-for url in URLS:
+for url in urls:
     response = requests.get(url)
     soup = BeautifulSoup(response.content, 'html.parser')
     
-    shops = soup.find_all('li')
-    for shop in shops:
-        name = shop.find('p', class_='name').get_text() if shop.find('p', class_='name') else None
-        address = shop.find('p', class_='address').get_text() if shop.find('p', class_='address') else None
-        if name and address:
-            data.append({'店舗名': name, '住所': address})
+    # 店舗名の抽出
+    name_tag = soup.find('h1', class_='page-fv__tit')
+    name = name_tag.get_text().strip() if name_tag else None
+    
+    # 住所の抽出
+    address_tag = soup.find('p', class_='single-store-common__txt single-store-address__txt')
+    address = address_tag.get_text().strip() if address_tag else None
+    
+    if name and address:
+        data.append({'店舗名': name, '住所': address})
 
 # データフレームの作成
 df = pd.DataFrame(data)
 
-# データフレームを表示
+# データフレームを表示して確認
 print(df)
 
 # 住所から緯度・経度を取得する関数
@@ -62,15 +145,18 @@ def get_lat_long(api_key, address):
 API_KEY = "AIzaSyA2ghhF-QX1JbH36JdhWghvjMXRhigddZA"
 
 # 住所から緯度・経度を取得
-lat_long_data = [get_lat_long(API_KEY, address) for address in df['住所']]
-df['緯度'], df['経度'] = zip(*lat_long_data)
+if not df.empty:
+    lat_long_data = [get_lat_long(API_KEY, address) for address in df['住所']]
+    df['緯度'], df['経度'] = zip(*lat_long_data)
 
-# データをスプレッドシートに書き込む
-values = [df.columns.values.tolist()] + df.values.tolist()
-body = {
-    'values': values
-}
-result = sheet.values().update(spreadsheetId=SPREADSHEET_ID, range=RANGE_NAME,
-                               valueInputOption='RAW', body=body).execute()
+    # データをスプレッドシートに書き込む
+    values = [df.columns.values.tolist()] + df.values.tolist()
+    body = {
+        'values': values
+    }
+    result = sheet.values().update(spreadsheetId=SPREADSHEET_ID, range=RANGE_NAME,
+                                   valueInputOption='RAW', body=body).execute()
 
-print(f"{result.get('updatedCells')} cells updated.")
+    print(f"{result.get('updatedCells')} cells updated.")
+else:
+    print("No data to update in the spreadsheet.")

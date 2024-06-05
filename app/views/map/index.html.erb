@@ -10,20 +10,74 @@
 
   <!-- Google Maps APIを非同期で読み込む -->
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2ghhF-QX1JbH36JdhWghvjMXRhigddZA&callback=initMap"></script>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+    }
+    #map {
+      height: 80vh; /* ビューポートの80%の高さ */
+      width: 75%;
+      float: right;
+    }
+    #sidebar {
+      height: 80vh; /* ビューポートの80%の高さ */
+      width: 25%;
+      float: left;
+      overflow-y: scroll;
+      padding-right: 20px;
+      padding-left: 10px; /* サイドバー内の要素を少し右に寄せる */
+    }
+    #gym-list {
+      list-style-type: none;
+      padding: 0;
+    }
+    #gym-list li {
+      margin-bottom: 10px;
+      border: 2px solid black;
+      padding: 10px;
+      padding-left: 15px; /* アイテムをさらに右に寄せる */
+    }
+  </style>
 </head>
 <body>
-  <h1>ジムの場所</h1>
+  <!-- ナビゲーションバーを追加 -->
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="#">Gym Locator</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <%= link_to 'トップページに戻る', root_path, class: 'nav-link' %>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <h1 class="text-center">ジムの場所</h1>
   
-  <div id="map" style="height: 500px;"></div>
+  <div id="sidebar">
+    <h2>ジムリスト</h2>
+    <ul id="gym-list" class="list-group"></ul>
+  </div>
+  
+  <div id="map"></div>
 
   <script>
     function initMap() {
+      var gyms = <%= raw @gyms.to_json %>;
+
+      // 最初のジムの位置を中心に設定
+      var initialLatLng = { lat: gyms[0].latitude, lng: gyms[0].longitude };
+
       var map = new google.maps.Map(document.getElementById('map'), {
         zoom: 12,
-        center: { lat: 35.6895, lng: 139.6917 }
+        center: initialLatLng
       });
-
-      var gyms = <%= raw @gyms.to_json %>;
 
       var infowindow = new google.maps.InfoWindow();
 
@@ -43,6 +97,16 @@
         marker.addListener('mouseout', function() {
           infowindow.close();
         });
+
+        var listItem = document.createElement('li');
+        listItem.className = 'list-group-item';
+        listItem.textContent = gym.gym_name + ' - ' + gym.address;
+        listItem.addEventListener('click', function() {
+          map.setCenter(marker.getPosition());
+          infowindow.setContent('<div><strong>' + gym.gym_name + '</strong><br>' + gym.address + '</div>');
+          infowindow.open(map, marker);
+        });
+        document.getElementById('gym-list').appendChild(listItem);
       });
     }
   </script>

@@ -3,6 +3,8 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 import mysql.connector
 from datetime import datetime
+import difflib
+import time
 
 # サービスアカウントキーのJSONファイルパス
 SERVICE_ACCOUNT_FILE = 'keen-dispatch-424708-v5-53a1436f17bd.json'
@@ -20,19 +22,53 @@ credentials = service_account.Credentials.from_service_account_file(
 
 # Google Sheets APIのサービスを作成
 service = build('sheets', 'v4', credentials=credentials)
-sheet = service.spreadsheets()
+
+# リトライロジックを追加
+def get_sheet_values(service, spreadsheet_id, range_name, retries=5):
+    for attempt in range(retries):
+        try:
+            sheet = service.spreadsheets()
+            result = sheet.values().get(spreadsheetId=spreadsheet_id, range=range_name).execute()
+            return result.get('values', [])
+        except Exception as e:
+            print(f"Attempt {attempt + 1} failed with error: {e}")
+            if attempt < retries - 1:
+                time.sleep(2 ** attempt)  # Exponential backoff
+            else:
+                print("Maximum retries reached. Exiting.")
+                raise
 
 # スプレッドシート1のデータを取得
-result1 = sheet.values().get(spreadsheetId=SPREADSHEET_ID1, range=RANGE_NAME1).execute()
-values1 = result1.get('values', [])
+values1 = get_sheet_values(service, SPREADSHEET_ID1, RANGE_NAME1)
 
 # スプレッドシート2のデータを取得
-result2 = sheet.values().get(spreadsheetId=SPREADSHEET_ID2, range=RANGE_NAME2).execute()
-values2 = result2.get('values', [])
+values2 = get_sheet_values(service, SPREADSHEET_ID2, RANGE_NAME2)
 
 # データフレームの作成
 df1 = pd.DataFrame(values1[1:], columns=values1[0])
 df2 = pd.DataFrame(values2[1:], columns=values2[0])
+
+# None値を取り除く
+df2 = df2.dropna(subset=['器具名'])
+
+# 類似名を統一する関数
+def normalize_equipment_names(equipment_list):
+    unique_names = list(set(filter(None, equipment_list)))
+    normalized_dict = {}
+    for name in equipment_list:
+        match = difflib.get_close_matches(name, unique_names, n=1, cutoff=0.8)
+        if match:
+            normalized_dict[name] = match[0]
+        else:
+            normalized_dict[name] = name
+    return normalized_dict
+
+# 器具名のリストを正規化
+equipment_names = df2['器具名'].tolist()
+normalized_names_dict = normalize_equipment_names(equipment_names)
+
+# 正規化された名前に基づいて器具名を更新
+df2['器具名'] = df2['器具名'].map(normalized_names_dict)
 
 # MySQLデータベースに接続
 conn = mysql.connector.connect(
@@ -93,13 +129,27 @@ for index, row in df1.iterrows():
     ''', (row['店舗名'], row['住所'], row['緯度'], row['経度'], datetime.now(), datetime.now()))
     conn.commit()
 
+# 挿入されたジムを確認
+cursor.execute('SELECT gym_name FROM gyms')
+gyms_inserted = cursor.fetchall()
+print(f"Gyms inserted: {gyms_inserted}")
+
 # スプレッドシート2のデータを器具テーブルに挿入
 for index, row in df2.iterrows():
-    cursor.execute('''
-    INSERT INTO equipments (equipment_name, created_at, updated_at)
-    VALUES (%s, %s, %s)
-    ''', (row['器具名'], datetime.now(), datetime.now()))
-    conn.commit()
+    equipment_name = row['器具名']
+    if equipment_name:  # equipment_nameがNULLでないか確認
+        cursor.execute('''
+        INSERT INTO equipments (equipment_name, created_at, updated_at)
+        VALUES (%s, %s, %s)
+        ''', (equipment_name, datetime.now(), datetime.now()))
+        conn.commit()
+    else:
+        print(f"Skipped insertion: equipment_name is None for row {index}")
+
+# 挿入された器具を確認
+cursor.execute('SELECT equipment_name FROM equipments')
+equipments_inserted = cursor.fetchall()
+print(f"Equipments inserted: {equipments_inserted}")
 
 # gym_equipmentsテーブルにデータを挿入
 for index, row in df2.iterrows():
@@ -122,7 +172,7 @@ for index, row in df2.iterrows():
         ''', (gym_id, equipment_id, datetime.now(), datetime.now()))
         conn.commit()
     else:
-        print(f"Gym or Equipment not found for entry: {row}")
+        print(f"Gym or Equipment not found for entry: {row['店舗名']} - {row['器具名']}")
 
 # コミットして接続を閉じる
 conn.commit()
