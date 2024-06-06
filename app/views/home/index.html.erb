@@ -97,7 +97,7 @@
                 <div class="region-name"><%= region %></div>
                 <% prefectures.each do |prefecture| %>
                   <div class="form-check prefecture-item">
-                    <input class="form-check-input" type="checkbox" name="prefectures[]" value="<%= prefecture %>" id="prefecture_<%= prefecture %>">
+                    <input class="form-check-input prefecture-checkbox" type="checkbox" name="prefectures[]" value="<%= prefecture %>" id="prefecture_<%= prefecture %>">
                     <label class="form-check-label" for="prefecture_<%= prefecture %>">
                       <%= prefecture %>
                     </label>
@@ -121,6 +121,22 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
   <script>
     $(document).ready(function() {
+      // 器具のチェックボックス制限
+      $('.equipment-checkbox').change(function() {
+        if ($('.equipment-checkbox:checked').length > 3) {
+          $(this).prop('checked', false);
+          alert('器具は最大3つまで選択できます。');
+        }
+      });
+
+      // 都道府県のチェックボックス制限
+      $('.prefecture-checkbox').change(function() {
+        if ($('.prefecture-checkbox:checked').length > 1) {
+          $(this).prop('checked', false);
+          alert('都道府県は1つだけ選択できます。');
+        }
+      });
+
       $('#next-to-prefecture').click(function() {
         var selectedEquipments = [];
         $('.equipment-checkbox:checked').each(function() {
