@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Gym Locator Search</title>
+  <title>Gym Locator</title>
   <%= csrf_meta_tags %>
   <%= csp_meta_tag %>
 
@@ -9,7 +9,7 @@
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <style>
     .modal-dialog {
-      max-width: 1200px;
+      max-width: 900px;
     }
     .modal-body {
       max-height: 70vh;
@@ -39,7 +39,7 @@
   </style>
 </head>
 <body>
-  <h1>Gym_Locator</h1>
+  <h1>Gym Locator</h1>
 
   <div class="container">
     <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#equipmentModal">
@@ -47,6 +47,7 @@
     </button>
   </div>
 
+  <!-- 器具選択モーダル -->
   <div class="modal fade" id="equipmentModal" tabindex="-1" role="dialog" aria-labelledby="equipmentModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -78,6 +79,7 @@
     </div>
   </div>
 
+  <!-- 都道府県選択モーダル -->
   <div class="modal fade" id="prefectureModal" tabindex="-1" role="dialog" aria-labelledby="prefectureModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
@@ -89,7 +91,7 @@
         </div>
         <div class="modal-body">
           <form id="selection-form" action="/map" method="get">
-            <input type="hidden" id="selected-equipments" name="equipments[]" value="">
+            <input type="hidden" id="selected-equipments" name="equipments" value="">
             <div id="prefectureList">
               <% @regions.each do |region, prefectures| %>
                 <div class="region-name"><%= region %></div>
@@ -103,6 +105,7 @@
                 <% end %>
               <% end %>
             </div>
+            <input type="hidden" name="search_mode" value="any">
           </form>
         </div>
         <div class="modal-footer">

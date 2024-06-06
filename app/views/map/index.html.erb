@@ -38,13 +38,13 @@
       margin-bottom: 10px;
       border: 2px solid black;
       padding: 10px;
-      padding-left: 15px; 
     }
     .gym-name {
-      font-size: 1.2em; /* 親要素に対して1.2倍 */
+      font-size: 1.2em; /* 店舗名のフォントサイズを大きく */
+      font-weight: bold;
     }
     .gym-address {
-      font-size: 0.8em; /* 親要素に対して0.8倍 */
+      font-size: 0.8em; /* 住所のフォントサイズを小さく */
     }
   </style>
 </head>
@@ -69,6 +69,17 @@
   <div id="sidebar">
     <h2>ジムリスト</h2>
     <ul id="gym-list" class="list-group"></ul>
+    <% if @gyms.empty? %>
+      <p>一致する店舗はありません。</p>
+    <% end %>
+    <div class="form-group mt-3">
+      <label for="search-mode">検索モード:</label><br>
+      <input type="radio" id="match-any" name="search_mode" value="any" <%= 'checked' if params[:search_mode] == 'any' %>>
+      <label for="match-any">一部一致</label><br>
+      <input type="radio" id="match-all" name="search_mode" value="all" <%= 'checked' if params[:search_mode] == 'all' %>>
+      <label for="match-all">全て一致</label><br>
+      <button type="button" id="change-search-mode" class="btn btn-primary mt-2">検索モードを変更</button>
+    </div>
   </div>
   
   <div id="map"></div>
@@ -127,8 +138,26 @@
 
           document.getElementById('gym-list').appendChild(listItem);
         });
+      } else {
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 12,
+          center: { lat: 35.6895, lng: 139.6917 } // デフォルトは東京
+        });
       }
     }
+
+    document.getElementById('change-search-mode').addEventListener('click', function() {
+      var searchMode = document.querySelector('input[name="search_mode"]:checked').value;
+      var equipments = "<%= params[:equipments].is_a?(Array) ? params[:equipments].join(',') : params[:equipments] %>";
+      var prefectures = "<%= params[:prefectures].is_a?(Array) ? params[:prefectures].join(',') : params[:prefectures] %>";
+      
+      var url = new URL(window.location.href);
+      url.searchParams.set('search_mode', searchMode);
+      url.searchParams.set('equipments', equipments);
+      url.searchParams.set('prefectures', prefectures);
+      
+      window.location.href = url.toString();
+    });
   </script>
 
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
