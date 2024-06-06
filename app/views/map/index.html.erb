@@ -38,7 +38,13 @@
       margin-bottom: 10px;
       border: 2px solid black;
       padding: 10px;
-      padding-left: 15px; /* アイテムをさらに右に寄せる */
+      padding-left: 15px; 
+    }
+    .gym-name {
+      font-size: 1.2em; /* 親要素に対して1.2倍 */
+    }
+    .gym-address {
+      font-size: 0.8em; /* 親要素に対して0.8倍 */
     }
   </style>
 </head>
@@ -71,43 +77,57 @@
     function initMap() {
       var gyms = <%= raw @gyms.to_json %>;
 
-      // 最初のジムの位置を中心に設定
-      var initialLatLng = { lat: gyms[0].latitude, lng: gyms[0].longitude };
+      if (gyms.length > 0) {
+        // 最初のジムの位置を中心に設定
+        var initialLatLng = { lat: gyms[0].latitude, lng: gyms[0].longitude };
 
-      var map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 12,
-        center: initialLatLng
-      });
-
-      var infowindow = new google.maps.InfoWindow();
-
-      gyms.forEach(function(gym) {
-        var marker = new google.maps.Marker({
-          position: { lat: gym.latitude, lng: gym.longitude },
-          map: map,
-          title: gym.gym_name,
-          icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+        var map = new google.maps.Map(document.getElementById('map'), {
+          zoom: 12,
+          center: initialLatLng
         });
 
-        marker.addListener('mouseover', function() {
-          infowindow.setContent('<div><strong>' + gym.gym_name + '</strong><br>' + gym.address + '</div>');
-          infowindow.open(map, marker);
-        });
+        var infowindow = new google.maps.InfoWindow();
 
-        marker.addListener('mouseout', function() {
-          infowindow.close();
-        });
+        gyms.forEach(function(gym) {
+          var marker = new google.maps.Marker({
+            position: { lat: gym.latitude, lng: gym.longitude },
+            map: map,
+            title: gym.gym_name,
+            icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
+          });
 
-        var listItem = document.createElement('li');
-        listItem.className = 'list-group-item';
-        listItem.textContent = gym.gym_name + ' - ' + gym.address;
-        listItem.addEventListener('click', function() {
-          map.setCenter(marker.getPosition());
-          infowindow.setContent('<div><strong>' + gym.gym_name + '</strong><br>' + gym.address + '</div>');
-          infowindow.open(map, marker);
+          marker.addListener('mouseover', function() {
+            infowindow.setContent('<div><strong>' + gym.gym_name + '</strong><br>' + gym.address + '</div>');
+            infowindow.open(map, marker);
+          });
+
+          marker.addListener('mouseout', function() {
+            infowindow.close();
+          });
+
+          var listItem = document.createElement('li');
+          listItem.className = 'list-group-item';
+
+          var gymNameDiv = document.createElement('div');
+          gymNameDiv.className = 'gym-name';
+          gymNameDiv.textContent = gym.gym_name;
+
+          var gymAddressDiv = document.createElement('div');
+          gymAddressDiv.className = 'gym-address';
+          gymAddressDiv.textContent = gym.address;
+
+          listItem.appendChild(gymNameDiv);
+          listItem.appendChild(gymAddressDiv);
+
+          listItem.addEventListener('click', function() {
+            map.setCenter(marker.getPosition());
+            infowindow.setContent('<div><strong>' + gym.gym_name + '</strong><br>' + gym.address + '</div>');
+            infowindow.open(map, marker);
+          });
+
+          document.getElementById('gym-list').appendChild(listItem);
         });
-        document.getElementById('gym-list').appendChild(listItem);
-      });
+      }
     }
   </script>
 
