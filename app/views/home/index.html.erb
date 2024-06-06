@@ -9,7 +9,11 @@
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
   <style>
     .modal-dialog {
-      max-width: 900px;
+      max-width: 1200px;
+    }
+    .modal-body {
+      max-height: 70vh;
+      overflow-y: auto;
     }
     #equipmentList, #prefectureList {
       display: flex;
@@ -20,55 +24,84 @@
       width: 30%;
       list-style: none;
     }
+    .region-name {
+      width: 100%;
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-top: 10px;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 5px;
+    }
+    .prefecture-item {
+      width: 30%;
+      list-style: none;
+    }
   </style>
 </head>
 <body>
   <h1>Gym_Locator</h1>
 
-  <!-- 検索フォーム -->
   <div class="container">
-    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#selectionModal">
-      器具と都道府県から選ぶ
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#equipmentModal">
+      器具を選ぶ
     </button>
   </div>
 
-  <!-- 器具と都道府県選択のモーダル -->
-  <div class="modal fade" id="selectionModal" tabindex="-1" role="dialog" aria-labelledby="selectionModalLabel" aria-hidden="true">
+  <div class="modal fade" id="equipmentModal" tabindex="-1" role="dialog" aria-labelledby="equipmentModalLabel" aria-hidden="true">
     <div class="modal-dialog" role="document">
       <div class="modal-content">
         <div class="modal-header">
-          <h5 class="modal-title" id="selectionModalLabel">器具と都道府県一覧</h5>
+          <h5 class="modal-title" id="equipmentModalLabel">器具を選択</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="equipment-form">
+            <div id="equipmentList">
+              <% @equipments.each do |equipment| %>
+                <div class="form-check">
+                  <input class="form-check-input equipment-checkbox" type="checkbox" name="equipments[]" value="<%= equipment.equipment_name %>" id="equipment_<%= equipment.equipment_name %>">
+                  <label class="form-check-label" for="equipment_<%= equipment.equipment_name %>">
+                    <%= equipment.equipment_name %>
+                  </label>
+                </div>
+              <% end %>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+          <button type="button" class="btn btn-primary" id="next-to-prefecture">次へ</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal fade" id="prefectureModal" tabindex="-1" role="dialog" aria-labelledby="prefectureModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="prefectureModalLabel">都道府県を選択</h5>
           <button type="button" class="close" data-dismiss="modal" aria-label="Close">
             <span aria-hidden="true">&times;</span>
           </button>
         </div>
         <div class="modal-body">
           <form id="selection-form" action="/map" method="get">
-            <div class="form-group">
-              <h6>器具を選択:</h6>
-              <div id="equipmentList">
-                <% @equipments.each do |equipment| %>
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" name="equipments[]" value="<%= equipment.equipment_name %>" id="equipment_<%= equipment.equipment_name %>">
-                    <label class="form-check-label" for="equipment_<%= equipment.equipment_name %>">
-                      <%= equipment.equipment_name %>
-                    </label>
-                  </div>
-                <% end %>
-              </div>
-            </div>
-            <div class="form-group">
-              <h6>都道府県を選択:</h6>
-              <div id="prefectureList">
-                <% @prefectures.each do |prefecture| %>
-                  <div class="form-check">
+            <input type="hidden" id="selected-equipments" name="equipments[]" value="">
+            <div id="prefectureList">
+              <% @regions.each do |region, prefectures| %>
+                <div class="region-name"><%= region %></div>
+                <% prefectures.each do |prefecture| %>
+                  <div class="form-check prefecture-item">
                     <input class="form-check-input" type="checkbox" name="prefectures[]" value="<%= prefecture %>" id="prefecture_<%= prefecture %>">
                     <label class="form-check-label" for="prefecture_<%= prefecture %>">
                       <%= prefecture %>
                     </label>
                   </div>
                 <% end %>
-              </div>
+              <% end %>
             </div>
           </form>
         </div>
@@ -83,5 +116,19 @@
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script>
+    $(document).ready(function() {
+      $('#next-to-prefecture').click(function() {
+        var selectedEquipments = [];
+        $('.equipment-checkbox:checked').each(function() {
+          selectedEquipments.push($(this).val());
+        });
+        $('#selected-equipments').val(selectedEquipments.join(','));
+
+        $('#equipmentModal').modal('hide');
+        $('#prefectureModal').modal('show');
+      });
+    });
+  </script>
 </body>
 </html>

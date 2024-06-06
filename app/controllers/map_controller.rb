@@ -1,7 +1,7 @@
 class MapController < ApplicationController
   def index
     @equipments = params[:equipments]
-    @selected_prefecture = params[:prefectures].first # 都道府県の選択を取得
+    @selected_prefecture = params[:prefectures].first if params[:prefectures].present?
     equipment_ids = Equipment.where(equipment_name: @equipments).pluck(:id)
     @gyms = Gym.joins(:gym_equipments).where(gym_equipments: { equipment_id: equipment_ids }).distinct
     @gyms = @gyms.where('address LIKE ?', "%#{@selected_prefecture}%") if @selected_prefecture.present?
