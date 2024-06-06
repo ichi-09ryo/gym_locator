@@ -123,9 +123,9 @@
     $(document).ready(function() {
       // 器具のチェックボックス制限
       $('.equipment-checkbox').change(function() {
-        if ($('.equipment-checkbox:checked').length > 3) {
+        if ($('.equipment-checkbox:checked').length > 1) {
           $(this).prop('checked', false);
-          alert('器具は最大3つまで選択できます。');
+          alert('器具は最大1つまで選択できます。');
         }
       });
 

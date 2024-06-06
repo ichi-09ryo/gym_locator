@@ -21,4 +21,21 @@ class EquipmentsController < ApplicationController
       format.json { render json: @equipments }
     end
   end
+  def search
+    # パラメータを取得
+    selected_equipments = params[:equipments].split(',')
+    selected_prefecture = params[:prefectures].first
+
+    # ジムを検索
+    @gyms = Gym.joins(:equipments)
+               .where(equipments: { equipment_name: selected_equipments })
+               .where(prefecture: selected_prefecture)
+               .distinct
+
+    # 結果をビューに渡す
+    respond_to do |format|
+      format.html { render :search_results } # 検索結果を表示するためのビューを指定
+      format.json { render json: @gyms }
+    end
+  end
 end
