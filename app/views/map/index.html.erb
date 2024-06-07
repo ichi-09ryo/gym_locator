@@ -18,17 +18,17 @@
       height: 100%;
     }
     #map {
-      height: 80vh; /* ビューポートの80%の高さ */
+      height: 80vh; 
       width: 75%;
       float: right;
     }
     #sidebar {
-      height: 80vh; /* ビューポートの80%の高さ */
+      height: 80vh; 
       width: 25%;
       float: left;
       overflow-y: scroll;
       padding-right: 20px;
-      padding-left: 10px; /* サイドバー内の要素を少し右に寄せる */
+      padding-left: 10px; 
     }
     #gym-list {
       list-style-type: none;
@@ -40,11 +40,24 @@
       padding: 10px;
       padding-left: 15px; 
     }
+
     .gym-name {
-      font-size: 1.2em; /* 親要素に対して1.2倍 */
+      font-size: 1.2em; 
     }
     .gym-address {
-      font-size: 0.8em; /* 親要素に対して0.8倍 */
+      font-size: 0.8em; 
+    }
+
+    .form-group-inline {
+      display: flex;
+      justify-content: space-between;
+    }
+    .form-group-inline .form-group {
+      flex: 1;
+      margin-right: 10px;
+    }
+    .form-group-inline .form-group:last-child {
+      margin-right: 0;
     }
   </style>
 </head>
@@ -67,6 +80,20 @@
   <h1 class="text-center">ジムの場所</h1>
   
   <div id="sidebar">
+    <h2>再検索</h2>
+    <%= form_with url: map_path, method: :get, local: true do |form| %>
+      <div class="form-group-inline">
+        <div class="form-group">
+          <%= form.label :equipments, '器具:' %>
+          <%= form.select :equipments, options_for_select(@available_equipments, params[:equipments]), {}, { class: 'form-control' } %>
+        </div>
+        <div class="form-group">
+          <%= form.label :prefectures, '都道府県:' %>
+          <%= form.select :prefectures, options_for_select(@regions.values.flatten, params[:prefectures]), {}, { class: 'form-control' } %>
+        </div>
+      </div>
+      <%= form.submit '検索', class: 'btn btn-primary' %>
+    <% end %>
     <h2>ジムリスト</h2>
     <ul id="gym-list" class="list-group"></ul>
   </div>
@@ -77,58 +104,71 @@
     function initMap() {
       var gyms = <%= raw @gyms.to_json %>;
 
-      if (gyms.length > 0) {
-        // 最初のジムの位置を中心に設定
-        var initialLatLng = { lat: gyms[0].latitude, lng: gyms[0].longitude };
+      // 最初のジムの位置を中心に設定
+      var initialLatLng = gyms.length > 0 ? { lat: gyms[0].latitude, lng: gyms[0].longitude } : { lat: 35.6895, lng: 139.6917 }; // 東京をデフォルトに設定
 
-        var map = new google.maps.Map(document.getElementById('map'), {
-          zoom: 12,
-          center: initialLatLng
+      var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 12,
+        center: initialLatLng
+      });
+
+      var infowindow = new google.maps.InfoWindow();
+
+      gyms.forEach(function(gym) {
+        var marker = new google.maps.Marker({
+          position: { lat: gym.latitude, lng: gym.longitude },
+          map: map,
+          title: gym.gym_name,
+          icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
         });
 
-        var infowindow = new google.maps.InfoWindow();
-
-        gyms.forEach(function(gym) {
-          var marker = new google.maps.Marker({
-            position: { lat: gym.latitude, lng: gym.longitude },
-            map: map,
-            title: gym.gym_name,
-            icon: 'http://maps.google.com/mapfiles/ms/icons/red-dot.png'
-          });
-
-          marker.addListener('mouseover', function() {
-            infowindow.setContent('<div><strong>' + gym.gym_name + '</strong><br>' + gym.address + '</div>');
-            infowindow.open(map, marker);
-          });
-
-          marker.addListener('mouseout', function() {
-            infowindow.close();
-          });
-
-          var listItem = document.createElement('li');
-          listItem.className = 'list-group-item';
-
-          var gymNameDiv = document.createElement('div');
-          gymNameDiv.className = 'gym-name';
-          gymNameDiv.textContent = gym.gym_name;
-
-          var gymAddressDiv = document.createElement('div');
-          gymAddressDiv.className = 'gym-address';
-          gymAddressDiv.textContent = gym.address;
-
-          listItem.appendChild(gymNameDiv);
-          listItem.appendChild(gymAddressDiv);
-
-          listItem.addEventListener('click', function() {
-            map.setCenter(marker.getPosition());
-            infowindow.setContent('<div><strong>' + gym.gym_name + '</strong><br>' + gym.address + '</div>');
-            infowindow.open(map, marker);
-          });
-
-          document.getElementById('gym-list').appendChild(listItem);
+        marker.addListener('mouseover', function() {
+          infowindow.setContent('<div><strong>' + gym.gym_name + '</strong><br>' + gym.address + '</div>');
+          infowindow.open(map, marker);
         });
-      }
+
+        marker.addListener('mouseout', function() {
+          infowindow.close();
+        });
+
+        var listItem = document.createElement('li');
+        listItem.className = 'list-group-item';
+        
+        // ジム名と住所を別々のdivにして、2段に分けたい
+        var gymNameDiv = document.createElement('div');
+        gymNameDiv.className = 'gym-name';
+        gymNameDiv.textContent = gym.gym_name;
+
+        var gymAddressDiv = document.createElement('div');
+        gymAddressDiv.className = 'gym-address';
+        gymAddressDiv.textContent = gym.address;
+
+        listItem.appendChild(gymNameDiv);
+        listItem.appendChild(gymAddressDiv);
+
+        listItem.addEventListener('click', function() {
+          map.setCenter(marker.getPosition());
+          infowindow.setContent('<div><strong>' + gym.gym_name + '</strong><br>' + gym.address + '</div>');
+          infowindow.open(map, marker);
+        });
+
+        document.getElementById('gym-list').appendChild(listItem);
+      });
     }
+
+    document.querySelector('form').addEventListener('submit', function(event) {
+      var equipmentSelect = document.getElementById('equipment-select');
+      var selectedOptions = Array.from(equipmentSelect.selectedOptions).map(option => option.value);
+      
+      // 選択された値を配列としてhidden inputに追加
+      selectedOptions.forEach(function(value) {
+        var hiddenInput = document.createElement('input');
+        hiddenInput.type = 'hidden';
+        hiddenInput.name = 'equipments[]';
+        hiddenInput.value = value;
+        this.appendChild(hiddenInput);
+      }, this);
+    });
   </script>
 
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
