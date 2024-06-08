@@ -4,12 +4,6 @@ function initMap() {
     center: { lat: 35.6895, lng: 139.6917 }
   });
 
-  var gyms = [
-    { lat: 35.6957, lng: 139.698, name: 'エニタイムフィットネス新宿西口店', prefecture: '東京都' },
-    { lat: 35.6928, lng: 139.722, name: 'エニタイムフィットネス曙橋店', prefecture: '東京都' },
-    // 他のジムのデータを追加
-  ];
-
   var markers = gyms.map(function(gym) {
     var marker = new google.maps.Marker({
       position: { lat: gym.lat, lng: gym.lng },

@@ -5,7 +5,7 @@ import psycopg2
 from datetime import datetime
 import time
 from urllib.parse import urlparse
-
+œœœ
 # サービスアカウントキーのJSONファイルパス
 SERVICE_ACCOUNT_FILE = 'keen-dispatch-424708-v5-53a1436f17bd.json'
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
