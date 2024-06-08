@@ -59,20 +59,24 @@
     .form-group-inline .form-group:last-child {
       margin-right: 0;
     }
+
+    .no-gyms-message {
+      font-size: 1.2em;
+      color: red;
+      margin-top: 10px;
+    }
   </style>
 </head>
 <body>
   <!-- ナビゲーションバーを追加 -->
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="#">Gym Locator</a>
+    <%= link_to 'Gym Locator', root_path, class: 'navbar-brand' %> <!-- タイトルをクリックでトップページに遷移 -->
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
       <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav">
-        <li class="nav-item">
-          <%= link_to 'トップページに戻る', root_path, class: 'nav-link' %>
-        </li>
+        <!-- リンクを削除 -->
       </ul>
     </div>
   </nav>
@@ -96,6 +100,7 @@
     <% end %>
     <h2>ジムリスト</h2>
     <ul id="gym-list" class="list-group"></ul>
+    <div id="no-gyms-message" class="no-gyms-message" style="display: none;">対象のジムがありません</div>
   </div>
   
   <div id="map"></div>
@@ -104,8 +109,13 @@
     function initMap() {
       var gyms = <%= raw @gyms.to_json %>;
 
-      // 最初のジムの位置を中心に設定
-      var initialLatLng = gyms.length > 0 ? { lat: gyms[0].latitude, lng: gyms[0].longitude } : { lat: 35.6895, lng: 139.6917 }; // 東京をデフォルトに設定
+      // ジムがある場合は最初のジムの位置を中心に設定
+      var initialLatLng;
+      if (gyms.length > 0) {
+        initialLatLng = { lat: gyms[0].latitude, lng: gyms[0].longitude };
+      } else {
+        initialLatLng = { lat: 35.6895, lng: 139.6917 }; // デフォルトは東京
+      }
 
       var map = new google.maps.Map(document.getElementById('map'), {
         zoom: 12,
@@ -113,6 +123,11 @@
       });
 
       var infowindow = new google.maps.InfoWindow();
+
+      if (gyms.length === 0) {
+        document.getElementById('no-gyms-message').style.display = 'block';
+        return;
+      }
 
       gyms.forEach(function(gym) {
         var marker = new google.maps.Marker({
