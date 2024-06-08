@@ -3,8 +3,8 @@ from google.oauth2 import service_account
 from googleapiclient.discovery import build
 import psycopg2
 from datetime import datetime
-import difflib
 import time
+from urllib.parse import urlparse
 
 # サービスアカウントキーのJSONファイルパス
 SERVICE_ACCOUNT_FILE = 'keen-dispatch-424708-v5-53a1436f17bd.json'
@@ -51,31 +51,15 @@ df2 = pd.DataFrame(values2[1:], columns=values2[0])
 # None値を取り除く
 df2 = df2.dropna(subset=['器具名'])
 
-# 類似名を統一する関数
-def normalize_equipment_names(equipment_list):
-    unique_names = list(set(filter(None, equipment_list)))
-    normalized_dict = {}
-    for name in equipment_list:
-        match = difflib.get_close_matches(name, unique_names, n=1, cutoff=0.8)
-        if match:
-            normalized_dict[name] = match[0]
-        else:
-            normalized_dict[name] = name
-    return normalized_dict
-
-# 器具名のリストを正規化
-equipment_names = df2['器具名'].tolist()
-normalized_names_dict = normalize_equipment_names(equipment_names)
-
-# 正規化された名前に基づいて器具名を更新
-df2['器具名'] = df2['器具名'].map(normalized_names_dict)
-
 # PostgreSQLデータベースに接続
+url = urlparse('postgres://gym_locator_user:6d4bZHCSXNzf7Yb8frO91yq7bSCkUPzR@dpg-cpftt8n79t8c73e9tr3g-a.ohio-postgres.render.com/gym_locator')
 conn = psycopg2.connect(
-    host='your_production_host',
-    dbname='your_production_database',
-    user='your_production_user',
-    password='your_production_password'
+    host=url.hostname,
+    port=url.port,
+    user=url.username,
+    password=url.password,
+    dbname=url.path[1:],
+    sslmode='require'
 )
 cursor = conn.cursor()
 
