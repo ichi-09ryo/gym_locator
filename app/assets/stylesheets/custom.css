@@ -1,0 +1,56 @@
+.modal-dialog {
+  max-width: 1000px;
+}
+
+.modal-body {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+#equipmentList, #prefectureList {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+#equipmentList .form-check, #prefectureList .form-check {
+  width: 30%;
+  list-style: none;
+}
+
+.region-name {
+  width: 100%;
+  font-size: 1.2em;
+  font-weight: bold;
+  margin-top: 10px;
+  border-bottom: 1px solid #ddd;
+  padding-bottom: 5px;
+}
+
+.prefecture-item {
+  width: 30%;
+  list-style: none;
+}
+
+.center-container {
+  display: flex;
+  justify-content: center; 
+  align-items: center; 
+  height: 100vh;
+  text-align: center;
+}
+
+.gym-title {
+  font-size: 50px;
+  font-weight: bold; 
+  background-color: #f8f8f8;
+  padding: 20px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-top: 300px;
+}
