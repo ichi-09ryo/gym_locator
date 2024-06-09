@@ -54,3 +54,64 @@
   width: 100%;
   margin-top: 300px;
 }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
+#map {
+  height: 80vh; 
+  width: 75%;
+  float: right;
+}
+
+#sidebar {
+  height: 80vh; 
+  width: 25%;
+  float: left;
+  overflow-y: scroll;
+  padding-right: 20px;
+  padding-left: 10px; 
+}
+
+#gym-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+#gym-list li {
+  margin-bottom: 10px;
+  border: 2px solid black;
+  padding: 10px;
+  padding-left: 15px; 
+}
+
+.gym-name {
+  font-size: 1.2em; 
+}
+
+.gym-address {
+  font-size: 0.8em; 
+}
+
+.form-group-inline {
+  display: flex;
+  justify-content: space-between;
+}
+
+.form-group-inline .form-group {
+  flex: 1;
+  margin-right: 10px;
+}
+
+.form-group-inline .form-group:last-child {
+  margin-right: 0;
+}
+
+.no-gyms-message {
+  font-size: 1.2em;
+  color: red;
+  margin-top: 10px;
+}
