@@ -1,5 +1,50 @@
+body {
+  background-color: #E0F7FA; /* 淡い水色の背景色 */
+  color: #000; /* 黒い文字色 */
+  text-align: center;
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+h1.gym-title, h1.text-center {
+  font-size: 3em;
+  font-weight: bold;
+  margin-top: 20px;
+  color: #00796B; /* 落ち着いた緑色 */
+}
+
+.button-container {
+  margin-top: 20px;
+}
+
+button.large-button, .btn-primary {
+  font-size: 1.5em;
+  padding: 10px 20px;
+  background-color: #004D40; /* 落ち着いた緑色 */
+  border: none;
+  color: #fff;
+}
+
+.navbar-light .navbar-brand {
+  color: #004D40; /* 落ち着いた緑色 */
+}
+
+.navbar-light .navbar-toggler-icon {
+  color: #004D40; /* 落ち着いた緑色 */
+}
+
+.navbar-light .navbar-nav .nav-link {
+  color: #004D40; /* 落ち着いた緑色 */
+}
+
+.bg-custom {
+  background-color: #00796B; /* 落ち着いた緑色 */
+  color: #fff; /* 白い文字色 */
+}
+
 .modal-dialog {
-  max-width: 1000px;
+  max-width: 1200px; /* モーダルの横幅を広く */
 }
 
 .modal-body {
@@ -7,15 +52,42 @@
   overflow-y: auto;
 }
 
-#equipmentList, #prefectureList {
+/* 器具選択モーダルのスタイル */
+#equipmentModal .modal-body #equipmentList {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
+  justify-content: space-between; /* 両端揃えにする */
+  padding: 0 20px; /* 左右の空白を追加 */
 }
 
-#equipmentList .form-check, #prefectureList .form-check {
-  width: 30%;
+#equipmentModal .modal-body #equipmentList .form-check {
+  flex: 0 0 30%; /* 各項目を均等に配置し、左右の空白を統一 */
   list-style: none;
+  margin-bottom: 10px; /* アイテム間のスペースを追加 */
+  display: flex; /* フレックスボックスで整列 */
+  align-items: center; /* 中央揃え */
+}
+
+#equipmentModal .modal-body #equipmentList .form-check-label {
+  margin-left: 10px; /* ラベルの左側に余白を追加 */
+  font-size: 14px; /* 文字サイズを小さく */
+}
+
+/* 都道府県選択モーダルのスタイル */
+#prefectureModal .modal-body #prefectureList {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between; /* 両端揃えにする */
+  padding: 0 50px; /* 左右の空白を追加 */
+}
+
+#prefectureModal .modal-body #prefectureList .form-check {
+  flex: 0 0 calc(33.3333% - 20px); /* 各項目を均等に配置し、左右の空白を統一 */
+  list-style: none;
+  margin-bottom: 10px; /* アイテム間のスペースを追加 */
+  margin-left: 10px; /* 左の余白を追加 */
+  margin-right: 10px; /* 右の余白を追加 */
+  text-align: left; /* テキストを左揃え */
 }
 
 .region-name {
@@ -25,50 +97,31 @@
   margin-top: 10px;
   border-bottom: 1px solid #ddd;
   padding-bottom: 5px;
+  text-align: left; /* 左揃えにする */
 }
 
-.prefecture-item {
-  width: 30%;
-  list-style: none;
+.modal-header, .modal-footer {
+  background-color: #00796B; /* モーダルヘッダーとフッターの背景色を落ち着いた緑色に */
+  color: #fff; /* モーダルヘッダーとフッターの文字色を白に */
 }
 
-.center-container {
-  display: flex;
-  justify-content: center; 
-  align-items: center; 
-  height: 100vh;
-  text-align: center;
-}
-
-.gym-title {
-  font-size: 50px;
-  font-weight: bold; 
-  background-color: #f8f8f8;
-  padding: 20px;
-}
-
-.button-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  margin-top: 300px;
+.modal-content {
+  background-color: #FAFAFA; /* モーダル内容の背景色を白に近いグレーに */
+  color: #000; /* モーダル内容の文字色を黒に */
 }
 
 html, body {
-  margin: 0;
-  padding: 0;
   height: 100%;
 }
 
 #map {
-  height: 80vh; 
+  height: calc(80vh - 40px); /* 地図の高さを調整 */
   width: 75%;
   float: right;
 }
 
 #sidebar {
-  height: 80vh; 
+  height: calc(80vh - 40px); /* サイドバーの高さを調整 */
   width: 25%;
   float: left;
   overflow-y: scroll;
@@ -83,7 +136,7 @@ html, body {
 
 #gym-list li {
   margin-bottom: 10px;
-  border: 2px solid black;
+  border: 2px solid #004D40; /* 落ち着いた緑色の境界線 */
   padding: 10px;
   padding-left: 15px; 
 }
@@ -121,11 +174,12 @@ html, body {
   padding: 20px 40px; 
 }
 
-.navbar-brand {
-  font-size: 2.5em; 
-  font-weight: bold;
-}
-
-.navbar {
-  background-color: rgb(83, 99, 222) !important; 
+footer {
+  background-color: #00796B; /* フッターの背景色を落ち着いた緑色に */
+  color: #fff; /* フッターの文字色を白に */
+  text-align: center;
+  padding: 5px 0; /* フッターの高さを低く調整 */
+  position: fixed;
+  bottom: 0;
+  width: 100%;
 }
