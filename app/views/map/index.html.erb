@@ -6,11 +6,11 @@
   <%= csp_meta_tag %>
 
   <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-  <%= stylesheet_link_tag 'custom', media: 'all', 'data-turbolinks-track': 'reload' %>
+  <%= stylesheet_link_tag 'styles', media: 'all', 'data-turbolinks-track': 'reload' %>
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
   <!-- Google Maps APIを非同期で読み込む -->
-  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2ghhF-QX1JbH36JdhWghvjMXRhigddZA&map_ids=167241f51e7ae110&callback=initMap"></script>
+  <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyA2ghhF-QX1JbH36JdhWghvjMXRhigddZA&map_ids=989747c457317a4d&callback=initMap"></script>
 </head>
 <body>
   <!-- ヘッダー -->
@@ -28,7 +28,6 @@
   <h1 class="text-center">ジムの場所</h1>
   
   <div id="sidebar">
-    
     <%= form_with url: map_path, method: :get, local: true do |form| %>
       <div class="form-group-inline">
         <div class="form-group">
@@ -68,7 +67,8 @@
 
       var map = new google.maps.Map(document.getElementById('map'), {
         zoom: 12,
-        center: initialLatLng
+        center: initialLatLng,
+        mapId: '989747c457317a4d'  // ここにマップIDを指定
       });
 
       var infowindow = new google.maps.InfoWindow();

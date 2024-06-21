@@ -25,6 +25,7 @@ https://gym-locator.onrender.com
 ## 実装予定の機能
 ・現在は一つの器具しか選択できないようにしていますが、それを三つ選択しても検索できるようにする予定です。
 ・ジムのお気に入り機能を追加する予定です。
+・GPSの位置情報を取得できるようにすることで、現在の位置から一番近いジムを探せるようにする予定です。
 
 ## データベース設計
 [![Image from Gyazo](https://i.gyazo.com/d5adf26f08d220ac04584ab8b8ab0d01.png)](https://gyazo.com/d5adf26f08d220ac04584ab8b8ab0d01)
