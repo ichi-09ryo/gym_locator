@@ -183,3 +183,65 @@ footer {
   bottom: 0;
   width: 100%;
 }
+
+body {
+  background-color: #e0f7fa; /* 背景色をライトグレーに */
+  color: #333; /* 文字色を濃いグレーに */
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+
+.container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding-top: 50px;
+}
+
+.card {
+  background-color: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.card-header {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.nav-tabs .nav-link {
+  font-weight: bold;
+  color: #004d40; /* 落ち着いた緑色 */
+}
+
+.nav-tabs .nav-link.active {
+  background-color: #004d40; /* 落ち着いた緑色 */
+  color: #fff;
+}
+
+.btn-twitter {
+  background-color: #1da1f2;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.btn-line {
+  background-color: #00b900;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.btn-facebook {
+  background-color: #3b5998;
+  color: #fff;
+  margin-bottom: 10px;
+}
+
+.terms {
+  margin-top: 20px;
+  font-size: 12px;
+}
+
+.terms a {
+  color: #004d40; /* 落ち着いた緑色 */
+}

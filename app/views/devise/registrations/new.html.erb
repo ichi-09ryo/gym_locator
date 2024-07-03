@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>新規登録</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+  <%= stylesheet_link_tag 'styles', media: 'all', 'data-turbolinks-track': 'reload' %>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="card-header">
+        <ul class="nav nav-tabs card-header-tabs">
+          <li class="nav-item">
+            <a class="nav-link active" href="#signup" data-toggle="tab">新規登録</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#login" data-toggle="tab">ログイン</a>
+          </li>
+        </ul>
+      </div>
+      <div class="card-body">
+        <div class="tab-content">
+          <div class="tab-pane active" id="signup">
+            <h2>SNSアカウントで登録</h2>
+            <a href="<%= user_twitter_omniauth_authorize_path %>" class="btn btn-twitter btn-block">Twitterで登録</a>
+            <a href="<%= user_line_omniauth_authorize_path %>" class="btn btn-line btn-block">LINEで登録</a>
+            <a href="<%= user_facebook_omniauth_authorize_path %>" class="btn btn-facebook btn-block">Facebookで登録</a>
+            <hr>
+            <%= form_with model: @user, url: user_registration_path, id: 'new_user', class: 'new_user', local: true do |f| %>
+              <%= render "devise/shared/error_messages", resource: resource %>
+
+              <div class="field">
+                <%= f.label :nickname, 'Nickname (10 characters maximum)' %><br />
+                <%= f.text_field :nickname, autofocus: true, maxlength: "10", class: 'form-control' %>
+              </div>
+
+              <div class="field">
+                <%= f.label :email, 'Email' %><br />
+                <%= f.email_field :email, autofocus: true, class: 'form-control' %>
+              </div>
+
+              <div class="field">
+                <%= f.label :password, 'Password (6 characters minimum)' %><br />
+                <%= f.password_field :password, autocomplete: "off", class: 'form-control' %>
+              </div>
+
+              <div class="field">
+                <%= f.label :password_confirmation, 'Password confirmation' %><br />
+                <%= f.password_field :password_confirmation, autocomplete: "off", class: 'form-control' %>
+              </div>
+
+              <div class="actions">
+                <%= f.submit "Sign up", class: 'btn btn-primary btn-block' %>
+              </div>
+            <% end %>
+          </div>
+          <div class="tab-pane" id="login">
+            <h2>ログイン</h2>
+            <a href="<%= user_twitter_omniauth_authorize_path %>" class="btn btn-twitter btn-block">Twitterでログイン</a>
+            <a href="<%= user_line_omniauth_authorize_path %>" class="btn btn-line btn-block">LINEでログイン</a>
+            <a href="<%= user_facebook_omniauth_authorize_path %>" class="btn btn-facebook btn-block">Facebookでログイン</a>
+            <hr>
+            <%= form_with model: @user, url: user_session_path, id: 'new_session', class: 'new_session', local: true do |f| %>
+              <%= render "devise/shared/error_messages", resource: resource %>
+
+              <div class="field">
+                <%= f.label :email, 'Email' %><br />
+                <%= f.email_field :email, autofocus: true, class: 'form-control' %>
+              </div>
+
+              <div class="field">
+                <%= f.label :password, 'Password' %><br />
+                <%= f.password_field :password, autocomplete: "off", class: 'form-control' %>
+              </div>
+
+              <div class="actions">
+                <%= f.submit "Log in", class: 'btn btn-primary btn-block' %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="terms">
+      アカウントを新規登録するにあたっては、<%= link_to '利用規約', terms_path %>と<%= link_to 'プライバシーポリシー', privacy_policy_path %>に同意するものとします。
+    </div>
+  </div>
+
+  <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

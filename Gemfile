@@ -76,3 +76,5 @@ gem "google-api-client", "~> 0.53.0"
 group :production do
   gem 'pg'
 end
+
+gem 'devise'
