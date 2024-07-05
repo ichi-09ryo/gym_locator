@@ -1,27 +1,116 @@
-<div class="contents row">
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ログイン</title>
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+  <%= stylesheet_link_tag 'registrations', media: 'all', 'data-turbolinks-track': 'reload' %>
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="registrations">
   <div class="container">
-    <h2>Log in</h2>
-    <%= form_with model: @user, url: user_session_path, id: 'new_user', class: 'new_user', local: true do |f| %>
-      <div class="field">
-        <%= f.label :email %><br />
-        <%= f.email_field :email, autofocus: true %>
+    <div class="card custom-modal">
+      <div class="card-header">
+        <ul class="nav nav-tabs card-header-tabs">
+          <li class="nav-item">
+            <a class="nav-link" href="#signup" data-toggle="tab">新規登録</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link active" href="#login" data-toggle="tab">ログイン</a>
+          </li>
+        </ul>
       </div>
+      <div class="card-body">
+        <div class="tab-content">
+          <div class="tab-pane" id="signup">
+            <div class="text-center">
+              <h2 class="card-title">SNSアカウントで登録</h2>
+              <div class="social-buttons">
+                <%= link_to "Twitterで登録", user_twitter_omniauth_authorize_path, class: "btn btn-twitter btn-block" %>
+                <%= link_to "LINEで登録", user_line_omniauth_authorize_path, class: "btn btn-line btn-block" %>
+                <%= link_to "Instagramで登録", user_instagram_omniauth_authorize_path, class: "btn btn-instagram btn-block" %>
+              </div>
+            </div>
+            <hr>
+            <%= form_with model: @user, url: user_registration_path, id: 'new_user', class: 'new_user', local: true do |f| %>
+              <%= render "devise/shared/error_messages", resource: resource %>
 
-      <div class="field">
-        <%= f.label :password %><br />
-        <%= f.password_field :password, autocomplete: "off" %>
-      </div>
+              <div class="field">
+                <%= f.label :nickname, "ニックネーム (10文字以内)" %><br />
+                <%= f.text_field :nickname, autofocus: true, maxlength: "10", class: 'form-control' %>
+              </div>
 
-      <% if devise_mapping.rememberable? %>
-        <div class="field">
-          <%= f.label :remember_me %><br />
-          <%= f.check_box :remember_me %>
+              <div class="field">
+                <%= f.label :email, "メールアドレス" %><br />
+                <%= f.email_field :email, autofocus: true, class: 'form-control' %>
+              </div>
+
+              <div class="field">
+                <%= f.label :password, "パスワード" %>
+                <% if @minimum_password_length %>
+                  <em>(<%= @minimum_password_length %>文字以上)</em>
+                <% end %><br />
+                <%= f.password_field :password, autocomplete: "off", class: 'form-control' %>
+              </div>
+
+              <div class="field">
+                <%= f.label :password_confirmation, "パスワード確認" %><br />
+                <%= f.password_field :password_confirmation, autocomplete: "off", class: 'form-control' %>
+              </div>
+
+              <div class="actions">
+                <%= f.submit "登録", class: 'btn btn-primary btn-block' %>
+              </div>
+            <% end %>
+          </div>
+          <div class="tab-pane active" id="login">
+            <div class="text-center">
+              <h2 class="card-title">SNSアカウントでログイン</h2>
+              <div class="social-buttons">
+                <%= link_to "Twitterでログイン", user_twitter_omniauth_authorize_path, class: "btn btn-twitter btn-block" %>
+                <%= link_to "LINEでログイン", user_line_omniauth_authorize_path, class: "btn btn-line btn-block" %>
+                <%= link_to "Instagramでログイン", user_instagram_omniauth_authorize_path, class: "btn btn-instagram btn-block" %>
+              </div>
+            </div>
+            <hr>
+            <%= form_with model: @user, url: user_session_path, id: 'new_session', class: 'new_user', local: true do |f| %>
+              <%= render "devise/shared/error_messages", resource: resource %>
+
+              <div class="field">
+                <%= f.label :email, "メールアドレス" %><br />
+                <%= f.email_field :email, autofocus: true, class: 'form-control' %>
+              </div>
+
+              <div class="field">
+                <%= f.label :password, "パスワード" %><br />
+                <%= f.password_field :password, autocomplete: "off", class: 'form-control' %>
+              </div>
+
+              <% if devise_mapping.rememberable? %>
+                <div class="field">
+                  <%= f.check_box :remember_me %>
+                  <%= f.label :remember_me, "ログイン情報を記憶する" %>
+                </div>
+              <% end %>
+
+              <div class="actions">
+                <%= f.submit "ログイン", class: 'btn btn-primary btn-block' %>
+              </div>
+            <% end %>
+          </div>
         </div>
-      <% end -%>
-
-      <div class="actions">
-        <%= f.submit "Log in" %>
       </div>
-    <% end %>
+    </div>
+    <div class="terms">
+      アカウントを新規登録するにあたっては、<%= link_to '利用規約', terms_path %>と<%= link_to 'プライバシーポリシー', privacy_policy_path %>に同意するものとします。
+    </div>
   </div>
-</div>
+
+  <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

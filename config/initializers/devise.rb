@@ -1,5 +1,3 @@
-# frozen_string_literal: true
-
 Devise.setup do |config|
   config.mailer_sender = 'please-change-me-at-config-initializers-devise@example.com'
 
@@ -19,9 +17,9 @@ Devise.setup do |config|
   config.reset_password_within = 6.hours
   config.sign_out_via = :delete
 
-  config.omniauth :twitter, ENV['TWITTER_API_KEY'], ENV['TWITTER_API_SECRET']
+  config.omniauth :twitter, ENV['TWITTER_API_KEY'], ENV['TWITTER_API_SECRET'], callback_url: ENV['TWITTER_CALLBACK_URL']
   config.omniauth :line, ENV['LINE_CLIENT_ID'], ENV['LINE_CLIENT_SECRET'], callback_url: ENV['LINE_CALLBACK_URL']
-  config.omniauth :instagram, ENV['INSTAGRAM_CLIENT_ID'], ENV['INSTAGRAM_CLIENT_SECRET']
+  config.omniauth :instagram, ENV['INSTAGRAM_CLIENT_ID'], ENV['INSTAGRAM_CLIENT_SECRET'], callback_url: ENV['INSTAGRAM_CALLBACK_URL']
 
   config.responder.error_status = :unprocessable_entity
   config.responder.redirect_status = :see_other
