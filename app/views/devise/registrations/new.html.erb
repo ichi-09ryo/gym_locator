@@ -6,12 +6,12 @@
   <%= csp_meta_tag %>
 
   <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-  <%= stylesheet_link_tag 'styles', media: 'all', 'data-turbolinks-track': 'reload' %>
+  <%= stylesheet_link_tag 'registrations', media: 'all', 'data-turbolinks-track': 'reload' %>
   <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 </head>
-<body>
+<body class="registrations">
   <div class="container">
-    <div class="card">
+    <div class="card custom-modal">
       <div class="card-header">
         <ul class="nav nav-tabs card-header-tabs">
           <li class="nav-item">
@@ -25,31 +25,38 @@
       <div class="card-body">
         <div class="tab-content">
           <div class="tab-pane active" id="signup">
-            <h2>SNSアカウントで登録</h2>
-            <a href="<%= user_twitter_omniauth_authorize_path %>" class="btn btn-twitter btn-block">Twitterで登録</a>
-            <a href="<%= user_line_omniauth_authorize_path %>" class="btn btn-line btn-block">LINEで登録</a>
-            <a href="<%= user_facebook_omniauth_authorize_path %>" class="btn btn-facebook btn-block">Facebookで登録</a>
+            <div class="text-center">
+              <h2 class="card-title">SNSアカウントで登録</h2>
+              <div class="social-buttons">
+                <%= link_to "Twitterで登録", user_twitter_omniauth_authorize_path, class: "btn btn-twitter btn-block" %>
+                <%= link_to "LINEで登録", user_line_omniauth_authorize_path, class: "btn btn-line btn-block" %>
+                <%= link_to "Instagramで登録", user_instagram_omniauth_authorize_path, class: "btn btn-instagram btn-block" %>
+              </div>
+            </div>
             <hr>
             <%= form_with model: @user, url: user_registration_path, id: 'new_user', class: 'new_user', local: true do |f| %>
               <%= render "devise/shared/error_messages", resource: resource %>
 
               <div class="field">
-                <%= f.label :nickname, 'Nickname (10 characters maximum)' %><br />
+                <%= f.label :nickname, "ニックネーム (10文字以内)" %><br />
                 <%= f.text_field :nickname, autofocus: true, maxlength: "10", class: 'form-control' %>
               </div>
 
               <div class="field">
-                <%= f.label :email, 'Email' %><br />
+                <%= f.label :email, "メールアドレス" %><br />
                 <%= f.email_field :email, autofocus: true, class: 'form-control' %>
               </div>
 
               <div class="field">
-                <%= f.label :password, 'Password (6 characters minimum)' %><br />
+                <%= f.label :password, "パスワード" %>
+                <% if @minimum_password_length %>
+                  <em>(<%= @minimum_password_length %>文字以上)</em>
+                <% end %><br />
                 <%= f.password_field :password, autocomplete: "off", class: 'form-control' %>
               </div>
 
               <div class="field">
-                <%= f.label :password_confirmation, 'Password confirmation' %><br />
+                <%= f.label :password_confirmation, "パスワード確認" %><br />
                 <%= f.password_field :password_confirmation, autocomplete: "off", class: 'form-control' %>
               </div>
 
@@ -62,7 +69,7 @@
             <h2>ログイン</h2>
             <a href="<%= user_twitter_omniauth_authorize_path %>" class="btn btn-twitter btn-block">Twitterでログイン</a>
             <a href="<%= user_line_omniauth_authorize_path %>" class="btn btn-line btn-block">LINEでログイン</a>
-            <a href="<%= user_facebook_omniauth_authorize_path %>" class="btn btn-facebook btn-block">Facebookでログイン</a>
+            <a href="<%= user_instagram_omniauth_authorize_path %>" class="btn btn-instagram btn-block">Instagramでログイン</a>
             <hr>
             <%= form_with model: @user, url: user_session_path, id: 'new_session', class: 'new_session', local: true do |f| %>
               <%= render "devise/shared/error_messages", resource: resource %>

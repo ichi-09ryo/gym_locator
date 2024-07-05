@@ -7,6 +7,12 @@ class HomeController < ApplicationController
     end
   end
 
+  def terms
+  end
+
+  def privacy_policy
+  end
+
   def index
     @equipments = Equipment.select(:equipment_name).distinct
     @regions = {

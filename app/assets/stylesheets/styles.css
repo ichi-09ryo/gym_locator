@@ -1,5 +1,5 @@
 body {
-  background-color: #E0F7FA; /* 淡い水色の背景色 */
+  background-color: #e0f7fa; /* 淡い水色の背景色 */
   color: #000; /* 黒い文字色 */
   text-align: center;
   font-family: Arial, sans-serif;
@@ -192,7 +192,7 @@ body {
 }
 
 .container {
-  max-width: 400px;
+  max-width: 600px; /* 幅を広く */
   margin: 0 auto;
   padding-top: 50px;
 }
@@ -222,19 +222,52 @@ body {
 .btn-twitter {
   background-color: #1da1f2;
   color: #fff;
+  border-radius: 5px;
+  padding: 10px 20px;
   margin-bottom: 10px;
+  display: block;
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease;
+}
+
+.btn-twitter:hover {
+  background-color: #0d8cd5;
 }
 
 .btn-line {
   background-color: #00b900;
   color: #fff;
+  border-radius: 5px;
+  padding: 10px 20px;
   margin-bottom: 10px;
+  display: block;
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease;
+}
+
+.btn-line:hover {
+  background-color: #009900;
 }
 
 .btn-facebook {
   background-color: #3b5998;
   color: #fff;
+  border-radius: 5px;
+  padding: 10px 20px;
   margin-bottom: 10px;
+  display: block;
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+  transition: background-color 0.3s ease;
+}
+
+.btn-facebook:hover {
+  background-color: #2d4373;
 }
 
 .terms {

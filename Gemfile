@@ -78,3 +78,14 @@ group :production do
 end
 
 gem 'devise'
+
+gem 'devise'
+gem 'omniauth'
+gem 'omniauth-twitter'
+gem 'omniauth-facebook'
+gem 'omniauth-line'
+gem 'omniauth-instagram'
+
+gem 'dotenv-rails', groups: [:development, :test]
+
+gem 'dotenv-rails'
