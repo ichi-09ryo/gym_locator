@@ -2,58 +2,120 @@
 <html>
 <head>
   <title>Gym Locator Map</title>
-  <%= csrf_meta_tags %>
-  <%= csp_meta_tag %>
-
-  <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-  <%= stylesheet_link_tag 'styles', media: 'all', 'data-turbolinks-track': 'reload' %>
-  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
   <!-- Google Maps APIを非同期で読み込む -->
   <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCbID17VFI3V33bzscWBnkP0D_DBQ7I7Js&map_ids=989747c457317a4d&callback=initMap"></script>
+  <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+  <%= stylesheet_link_tag 'styles', media: 'all', 'data-turbolinks-track': 'reload' %>
 </head>
 <body>
-  <!-- ヘッダー -->
-  <nav class="navbar navbar-expand-lg navbar-light bg-custom">
-    <%= link_to 'Gym Locator', root_path, class: 'navbar-brand' %> <!-- タイトルをクリックでトップページに遷移 -->
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNav">
-      <ul class="navbar-nav">
-      </ul>
-    </div>
-  </nav>
-
   <h1 class="text-center">ジムの場所</h1>
-  
-  <div id="sidebar">
-    <%= form_with url: map_path, method: :get, local: true do |form| %>
-      <div class="form-group-inline">
-        <div class="form-group">
-          <%= form.label :equipments, '器具:' %>
-          <%= form.select :equipments, options_for_select(@available_equipments, params[:equipments]), {}, { class: 'form-control' } %>
+   <div id="sidebar">
+  <div class="form-group">
+    <div id="equipment-button" class="custom-button">
+      <span class="custom-label">器具</span>
+      <span class="custom-text">選択する</span>
+      <span class="custom-plus">+</span>
+    </div>
+  </div>
+  <div class="form-group">
+    <div id="prefecture-button" class="custom-button">
+      <span class="custom-label">都道府県</span>
+      <span class="custom-text">選択する</span>
+      <span class="custom-plus">+</span>
+    </div>
+  </div>
+  <div id="selected-equipments" class="form-group text-left">
+    <% if params[:equipments].present? %>
+      <% Array(params[:equipments]).each do |equipment| %>
+        <div class="selected-equipment badge badge-pill badge-secondary">
+          <%= equipment %>
+          <span class="remove-equipment" onclick="this.parentElement.remove()"> ×</span>
         </div>
-        <div class="form-group">
-          <%= form.label :prefectures, '都道府県:' %>
-          <%= form.select :prefectures, options_for_select(@regions.values.flatten, params[:prefectures]), {}, { class: 'form-control' } %>
+      <% end %>
+    <% end %>
+  </div>
+  <%= form_with url: map_path, method: :get, local: true do |form| %>
+    <input type="hidden" name="equipments" id="selected-equipments-input" value="<%= params[:equipments].is_a?(Array) ? params[:equipments].join(',') : params[:equipments] %>">
+    <input type="hidden" name="prefectures" id="selected-prefectures-input" value="<%= params[:prefectures].is_a?(Array) ? params[:prefectures].join(',') : params[:prefectures] %>">
+    <%= form.submit '検索', class: 'btn btn-primary' %>
+  <% end %>
+  <h2>ジムリスト</h2>
+  <ul id="gym-list" class="list-group"></ul>
+  <div id="no-gyms-message" class="no-gyms-message" style="display: none;">対象のジムがありません</div>
+</div>
+
+    <div id="map"></div>
+
+  <!-- 器具選択モーダル -->
+  <div class="modal fade" id="equipmentModal" tabindex="-1" role="dialog" aria-labelledby="equipmentModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="equipmentModalLabel">器具を選択</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="equipment-form">
+            <div id="equipmentList">
+              <% @equipments.each do |equipment| %>
+                <div class="form-check">
+                  <input class="form-check-input equipment-checkbox" type="checkbox" name="equipments[]" value="<%= equipment %>" id="equipment_<%= equipment %>">
+                  <label class="form-check-label" for="equipment_<%= equipment %>">
+                    <%= equipment %>
+                  </label>
+                </div>
+              <% end %>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+          <button type="button" class="btn btn-primary" id="apply-equipment-selection">適用</button>
         </div>
       </div>
-      <%= form.submit '検索', class: 'btn btn-primary' %>
-    <% end %>
-    <h2>ジムリスト</h2>
-    <ul id="gym-list" class="list-group"></ul>
-    <div id="no-gyms-message" class="no-gyms-message" style="display: none;">対象のジムがありません</div>
+    </div>
   </div>
-  
-  <div id="map"></div>
 
-  <!-- フッター -->
-  <footer class="bg-custom text-center text-white py-3">
-    <p>© 2023 Gym Locator</p>
-  </footer>
+    <!-- 都道府県選択モーダル -->
+  <div class="modal fade" id="prefectureModal" tabindex="-1" role="dialog" aria-labelledby="prefectureModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="prefectureModalLabel">都道府県を選択</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="selection-form" action="/map" method="get">
+            <input type="hidden" id="selected-equipments" name="equipments" value="">
+            <div id="prefectureList">
+              <% @regions.each do |region, prefectures| %>
+                <div class="region-name"><%= region %></div>
+                <% prefectures.each do |prefecture| %>
+                  <div class="form-check prefecture-item">
+                    <input class="form-check-input prefecture-checkbox" type="checkbox" name="prefectures[]" value="<%= prefecture %>" id="prefecture_<%= prefecture %>">
+                    <label class="form-check-label" for="prefecture_<%= prefecture %>">
+                      <%= prefecture %>
+                    </label>
+                  </div>
+                <% end %>
+              <% end %>
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">閉じる</button>
+          <button type="button" class="btn btn-primary" id="apply-prefecture-selection">適用</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <script>
+      <script>
     function initMap() {
       var gyms = <%= raw @gyms.to_json %>;
 
@@ -96,9 +158,9 @@
         });
 
         var listItem = document.createElement('li');
-        listItem.className = 'list-group-item';
+        listItem.className = 'list-group-item text-left'; // 左寄せのクラスを追加
         
-        // ジム名と住所を別々のdivにして、2段に分けたい
+        // ジム名と住所を別々のdivにして、2段に分ける
         var gymNameDiv = document.createElement('div');
         gymNameDiv.className = 'gym-name';
         gymNameDiv.textContent = gym.gym_name;
@@ -120,23 +182,81 @@
       });
     }
 
-    document.querySelector('form').addEventListener('submit', function(event) {
-      var equipmentSelect = document.getElementById('equipment-select');
-      var selectedOptions = Array.from(equipmentSelect.selectedOptions).map(option => option.value);
-      
-      // 選択された値を配列としてhidden inputに追加
-      selectedOptions.forEach(function(value) {
-        var hiddenInput = document.createElement('input');
-        hiddenInput.type = 'hidden';
-        hiddenInput.name = 'equipments[]';
-        hiddenInput.value = value;
-        this.appendChild(hiddenInput);
-      }, this);
-    });
-  </script>
+    document.addEventListener("DOMContentLoaded", function() {
+      document.getElementById('apply-equipment-selection').addEventListener('click', function() {
+        var selectedEquipments = [];
+        document.querySelectorAll('.equipment-checkbox:checked').forEach(function(checkbox) {
+          selectedEquipments.push(checkbox.value);
+        });
+        document.getElementById('selected-equipments-input').value = selectedEquipments.join(',');
+        document.getElementById('selected-equipments').innerHTML = selectedEquipments.map(function(equipment) {
+          return `<div class="selected-equipment">
+                    ${equipment}
+                    <span class="remove-equipment" onclick="this.parentElement.remove()"> ×</span>
+                  </div>`;
+        }).join('');
+        $('#equipmentModal').modal('hide');
+      });
 
+      document.getElementById('apply-prefecture-selection').addEventListener('click', function() {
+        var selectedPrefectures = [];
+        document.querySelectorAll('.prefecture-checkbox:checked').forEach(function(checkbox) {
+          selectedPrefectures.push(checkbox.value);
+        });
+        document.getElementById('selected-prefectures-input').value = selectedPrefectures.join(',');
+        $('#prefectureModal').modal('hide');
+      });
+    });
+
+      document.addEventListener("DOMContentLoaded", function() {
+  var equipmentButton = document.getElementById('equipment-button');
+  var prefectureButton = document.getElementById('prefecture-button');
+
+  // ボタンスタイルを適用する関数
+  function applyButtonStyle(element) {
+    element.style.display = 'flex';
+    element.style.alignItems = 'center';
+    element.style.border = '1px solid #ddd';
+    element.style.borderRadius = '5px';
+    element.style.padding = '10px';
+    element.style.backgroundColor = '#fff';
+    element.style.marginBottom = '10px';
+    element.style.cursor = 'pointer';
+  }
+
+  // 個々の要素にスタイルを適用する関数
+  function applyElementStyle(element, styles) {
+    for (var property in styles) {
+      element.style[property] = styles[property];
+    }
+  }
+
+  // 各要素にスタイルを適用
+  applyButtonStyle(equipmentButton);
+  applyButtonStyle(prefectureButton);
+
+  applyElementStyle(equipmentButton.querySelector('.custom-label'), { fontWeight: 'bold', color: '#000', marginRight: '10px' });
+  applyElementStyle(equipmentButton.querySelector('.custom-text'), { color: '#007bff', flexGrow: '1' });
+  applyElementStyle(equipmentButton.querySelector('.custom-plus'), { borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'transparent', color: '#007bff', fontSize: '16px', marginLeft: '10px' });
+
+  applyElementStyle(prefectureButton.querySelector('.custom-label'), { fontWeight: 'bold', color: '#000', marginRight: '10px' });
+  applyElementStyle(prefectureButton.querySelector('.custom-text'), { color: '#007bff', flexGrow: '1' });
+  applyElementStyle(prefectureButton.querySelector('.custom-plus'), { borderRadius: '50%', width: '24px', height: '24px', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'transparent', color: '#007bff', fontSize: '16px', marginLeft: '10px' });
+
+  // クリックイベントを設定
+  equipmentButton.addEventListener('click', function() {
+    $('#equipmentModal').modal('show');
+  });
+
+  prefectureButton.addEventListener('click', function() {
+    $('#prefectureModal').modal('show');
+  });
+});
+
+  </script>
   <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
 </body>
 </html>

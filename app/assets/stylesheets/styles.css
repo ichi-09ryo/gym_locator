@@ -278,3 +278,18 @@ body {
 .terms a {
   color: #004d40; /* 落ち着いた緑色 */
 }
+
+.selected-equipment {
+  display: inline-block;
+  background-color: #6c757d;
+  color: white;
+  padding: 0.3em 0.6em;
+  margin: 0.2em;
+  border-radius: 0.2em;
+}
+
+.selected-equipment .remove-equipment {
+  margin-left: 0.5em;
+  cursor: pointer;
+}
+

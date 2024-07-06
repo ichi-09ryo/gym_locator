@@ -1,0 +1,9 @@
+<div class="container">
+  <h1><%= current_user.nickname %>さんのプロフィール</h1>
+  <p>メールアドレス: <%= current_user.email %></p>
+  <ul class="nav">
+    <li class="nav-item">
+      <%= button_to 'ログアウト', destroy_user_session_path, method: :delete, class: 'nav-link btn btn-link' %>
+    </li>
+  </ul>
+</div>
